@@ -1,0 +1,421 @@
+<!DOCTYPE HTML>
+<!--
+	Dimension by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+			<title>Snake</title>     
+			<link rel="shortcut icon" href="snake.png" /> 
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="style.css"> 
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		
+		<style>
+				.slidecontainer {
+				  width: 100%;
+				}
+				
+				.slider {
+				  -webkit-appearance: none;
+				  width: 100%;
+				  height: 15px;
+				  border-radius: 5px;
+				  background: #d3d3d3;
+				  outline: none;
+				  opacity: 0.7;
+				  -webkit-transition: .2s;
+				  transition: opacity .2s;
+				}
+				
+				.slider:hover {
+				  opacity: 1;
+				}
+				
+				.slider::-webkit-slider-thumb {
+				  -webkit-appearance: none;
+				  appearance: none;
+				  width: 25px;
+				  height: 25px;
+				  border-radius: 50%;
+				  background: #4CAF50;
+				  cursor: pointer;
+				}
+				
+				.slider::-moz-range-thumb {
+				  width: 25px;
+				  height: 25px;
+				  border-radius: 50%;
+				  background: #4CAF50;
+				  cursor: pointer;
+				}
+				</style>   
+<script>
+	//setup(6);
+	var boardSize = 10;
+	var end = false;
+	var startTime;
+	var snakeSize = 1;
+
+	var snakeSpeed = 200;
+
+	var headi = Math.floor(boardSize / 2);
+	var headj = Math.floor(boardSize / 2);
+
+	var headsi = [];
+	var headsj = [];
+
+	var matrix = [];
+
+	var orient = null;
+
+	var nextMoves = [];
+
+	function setup()
+	{
+		headi = Math.floor(boardSize/2);
+		headj = headi;
+		orient = null;
+
+		nextMoves = [];
+		headsi = [];
+		headsj = [];
+		snakeSize = 1;
+		end = false;
+
+		startTime = performance.now();
+		for(var i=0; i < boardSize; i++) 
+		{
+			matrix[i] = [];
+
+			for(var j=0; j < boardSize; j++) {
+				matrix[i][j] = 0;
+			}   
+		}
+		moveSnakeHead();
+	}
+
+	function getRandomArbitrary(min, max)
+	{
+    	return Math.random() * (max - min) + min;
+	}
+	
+	function getRandomInt(min, max) {
+		min = Math.ceil(min);
+		max = Math.floor(max);
+   		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+	function randomApple()
+	{
+		var x,y;
+		do
+		{
+			x = getRandomInt(0,boardSize-1);
+			y = getRandomInt(0,boardSize-1);
+		} while(matrix[x][y] != 0);
+		
+		document.getElementById(x.toString() + y.toString()).style = "border-color: #ffff00;";
+		document.getElementById(x.toString() + y.toString()).src = "apple.png";
+		matrix[x][y] = 2;
+	}
+
+	function moveSnakeHead()
+	{
+		if(matrix[headi][headj] == 1)
+		{
+			congratulations(-1);
+			return;
+		}
+
+		headsi.push(headi);
+		headsj.push(headj);
+		document.getElementById(headi.toString() + headj.toString()).style = "border-color: #8dc63f;";
+		document.getElementById(headi.toString() + headj.toString()).style = "background-color: #8dc63f;";
+		document.getElementById(headi.toString() + headj.toString()).src = "snake.png";
+
+		if(headsi.length > 1) document.getElementById(headsi[headsi.length - 2].toString() + headsj[headsj.length - 2].toString()).src = "p.png";
+
+		if(headsi.length == boardSize * boardSize) 
+		{
+			end = true;
+			congratulations(1);
+			return;
+		}
+
+		if(headsi.length > 1) 
+		{
+			if(matrix[headi][headj] == 0) //not an apple
+			{
+				matrix[headsi[0]][headsj[0]] = 0;
+				document.getElementById(headsi[0].toString() + headsj[0].toString()).style = "border-color: #e7e7e7;";
+				document.getElementById(headsi[0].toString() + headsj[0].toString()).style = "background-color: none;";
+				headsi.shift();
+				headsj.shift();
+			}
+			else
+			{
+				randomApple();
+			}
+		}
+		else
+		{
+			matrix[headi][headj] = 1;
+			randomApple();
+
+		}
+		matrix[headi][headj] = 1;
+	}
+
+	function markWinningStreak()
+	{
+		for(var i = 0; i < winningStreak.length; i++)
+		{
+			document.getElementById(winningStreak[i]).style = "border-color: #8dc63f;";
+		}
+	}
+
+	function congratulations(res)
+	{           
+		end = true;
+		var finishTime = performance.now();
+		var timePlayed = finishTime - startTime;
+		var seconds = Math.round(timePlayed/100 * 10) / 100;
+		if(res == 1)
+		{
+			document.getElementById("cong").innerText = 'You have won! \n\n Play another game! :)' + '\n Time played: ' + seconds.toString() + ' seconds \n\n ';
+		}
+		else if(res == -1)
+		{
+			document.getElementById("cong").innerText = 'You have lost \n\n Play another game!' + '\n Time played: ' + seconds.toString() + ' seconds \n\n ';
+		}
+		//document.getElementById("cong").innerText = ;
+	}
+
+	function newGame()
+	{
+		//console.log(k);
+		//window.location.reload();
+		setupBoard();
+	}   
+
+	function setupBoard(size = 10)
+	{
+		document.getElementById("nesto").innerHTML = "";
+		var mq = window.matchMedia( "(max-width: 400px)" );
+		if (mq.matches) {
+			boardSize = 6;
+			size = boardSize;
+			//alert("mali je")
+		}
+		else
+		{
+			mq = window.matchMedia( "(max-width: 586px)" );
+			if (mq.matches) {
+				boardSize = 7;
+				size = boardSize;
+			}
+		}
+
+		for(var i = 0; i < size; i++)
+		{
+			for(var j = 0; j < size; j++)
+			{
+				document.getElementById("nesto").innerHTML += '<img src="p.png" onclick="play(' + i.toString() + ',' + j.toString() + ')" type="submit" class="button2" width="50" height="50" id="' + i.toString() + j.toString() + '" >'; 
+				//<img src="p.png" div onmousedown="play(0,0)" type="submit" class="button2" width="50" height="50" id="00" > </button>
+			}
+			document.getElementById("nesto").innerHTML += '<br>';
+		}
+		setup();
+	}
+	
+	function validCoord(x,y)
+	{
+		if(x >= 0 && x < boardSize && y >= 0 && y < boardSize) return true;
+		return false;
+	}
+
+	
+	function changeMove(move)
+	{
+		if(end) return;
+
+		var oldOrient = orient;
+
+		if (move == '38') { //up
+			if(orient == '40')
+				return;
+			
+			nextMoves.push(move);
+		}
+		else if (move == '40') { //down
+
+			if(orient == '38')
+				return;
+
+			nextMoves.push(move);
+		}
+		else if (move == '37') { //left
+			
+			if(orient == '39')
+				return;
+
+			nextMoves.push(move);
+
+		}
+		else if (move == '39') { //right
+			
+			if(orient == '37')
+				return;
+
+			nextMoves.push(move);
+		}
+		if(!oldOrient)
+			makeMove();
+	}
+
+	function makeMove()
+	{
+		if(end) return;
+
+		if(nextMoves.length > 0)
+		{
+			orient = nextMoves[0];
+
+			nextMoves.shift();
+		}
+
+		if (orient == '38') { 
+			if(validCoord(headi - 1, headj))
+			{
+				headi--;
+				moveSnakeHead();
+			}
+			else
+			{
+				congratulations(-1);
+			}
+		}
+		else if (orient == '40') {
+
+			if(validCoord(headi + 1, headj))
+			{
+				headi++;
+				moveSnakeHead();
+			}
+			else
+			{
+				congratulations(-1);
+			}
+		}
+		else if (orient == '37') { //left
+
+			if(validCoord(headi, headj - 1))
+			{
+				headj--;
+				moveSnakeHead();
+			}
+			else
+			{
+				congratulations(-1);
+			}
+		}
+		else if (orient == '39') { //right
+
+			if(validCoord(headi, headj + 1))
+			{
+				headj++;
+				moveSnakeHead();
+			}
+			else
+			{
+				congratulations(-1);
+			}
+		}setTimeout(function(){ makeMove(); }, snakeSpeed);
+	}
+
+
+
+</script>
+	</head>
+	<body onload="setupBoard()" class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="content">
+							<div class="inner">
+								
+								<div id="nesto"></div><br><br>
+								
+								<div id="cong" ></div>
+								<div class="hide"> 
+										<img src="up.png" onclick="changeMove('38')" type="submit" class="button2" width="50" height="50" /> 
+										<br>
+										<img src="left.png" onclick="changeMove('37')" type="submit" class="button2" width="50" height="50" /> 
+										<img src="p.png"  type="submit" class="button2" width="50" height="50" /> 
+										<img src="right.png" onclick="changeMove('39')" type="submit" class="button2" width="50" height="50" /> 
+										<br>
+										<img src="down.png" onclick="changeMove('40')" type="submit" class="button2" width="50" height="50" /> 
+										<br>
+										<br>
+								</div>
+										<div class="slidecontainer">
+												<p>Snake speed slider:</p>
+												<input type="range" min="70" max="1000" value="200" class="slider" id="range">
+												<p>Value: <span id="demo"></span></p>
+											  </div>
+													<button onclick="newGame()" type="submit"  width="600" value="New game">New game</button>
+												
+										  </div>   
+							  </div>   
+						</div>
+					</header>
+
+
+				<!-- Footer -->
+					<footer id="footer">
+							<i class=""><img src="http://www.aleksa.lukac.rs/img/logo.png" width=50/></i> 
+							<p class="w3-medium"><a href="https://aleksa.lukac.rs" target="_blank">aleksa.lukac.rs</a></p> 
+					</footer>
+
+			</div>
+			<script>
+				var slider = document.getElementById("range");
+				var output = document.getElementById("demo");
+				output.innerHTML = slider.value;
+				
+				slider.oninput = function() {
+					output.innerHTML = this.value;
+					snakeSpeed = this.value;
+					console.log("Speed " + snakeSpeed.toString());
+				}
+
+				window.addEventListener("keydown", function(e) {
+						// space and arrow keys
+						if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+							e.preventDefault();
+						}
+					}, false);
+
+
+			document.onkeydown = function Key(e) {
+				e = e || window.event;
+				//console.log(e.keyCode);
+				changeMove(e.keyCode);				
+			};
+</script>
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

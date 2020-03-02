@@ -1,0 +1,56 @@
+         
+        .button2 {
+            /*border-radius: 50%;*/
+            border: 2px solid black;
+            color: black;
+            cursor: pointer;
+            border-radius: 10%;
+           /* background-color: #e7e7e7;*/
+            border-color: #e7e7e7;
+           /*padding: 15px 15px;*/
+           /*border-color: coral;*/
+           text-align: center;
+           display: inline-block;
+       }
+
+       .button2:hover {
+        transform: scale(1.1); /* (110% zoom) */
+        }
+
+        .button:hover {
+            transform: scale(1.1); /* (110% zoom) */
+        }
+
+        .info {
+            background-color: #DCDCDC;
+            border: none;
+            color: black;
+            padding: 9px 10px 15px 13px;
+            
+            font-size: 12px;
+            text-align: center;
+            margin: 4px 2px;
+            /*
+            font-size: 16px;
+            /*border-color: coral;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;*/
+        }
+
+        .hide{
+            display: none;
+        }
+
+/* #### Mobile Phones Portrait or Landscape #### */
+@media screen and (max-device-width: 586px){
+   
+   .hide{
+            display: block;
+        }
+
+}
+        
